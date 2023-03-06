@@ -1,5 +1,19 @@
 #Anghel Andrei - Stelian, 312CA
 
+INTRODUCERE:
+
+	Am implementat un Load Balancer folosind Consistent Hashing.
+Acesta este un mecanism frecvent utilizat în cadrul sistemelor distribuite şi are
+avantajul de a îndeplini minimal disruption constraint, adică minimizarea numărului
+de transferuri necesare atunci când un server este oprit sau unul este pornit.
+Mai exact, când un server este oprit, doar obiectele aflate pe acesta trebuie redistribuite
+către servere apropiate. Analog, când un nou server este adaugat, va prelua obiecte
+doar de la un număr limitat de servere, cele vecine.
+	Am folosit un cerc imaginar numit hashring pentru a distribui uniform datele
+atribuite serverelor si pentru a mentine Consistent Hashing-ul. Mai mult, pentru a
+distribui obiectele cat mai aleatoriu am utlizat "replici", practic copii artificiale
+ale server-elor existente puse pe hashring.
+
 
 IDEE:
 	Cheia problemei consta in modul de stocare al datelor precum perechile
