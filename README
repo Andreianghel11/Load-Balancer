@@ -1,0 +1,65 @@
+#Anghel Andrei - Stelian, 312CA
+
+
+IDEE:
+	Cheia problemei consta in modul de stocare al datelor precum perechile
+cheie - valoare, etichetele serverelor, cat si serverele si hashtable-urile
+in sine. Astfel, am decis sa stochez replicile serverelor ce vor alcatui
+hash ring-ul prin intermediul unui vector circular alocat dinamic, ce poate
+stoca pana la 300 000 de elemente de tip int, iar serverele prin intermediul
+unei liste simplu inlantuite. In continuare voi prezenta structurile importante
+utilizate, cat si functiile specifice pe care le-am construit.
+
+
+-------------------------------------------------------------------------------
+
+
+STRUCTURI:
+	1) load_balancer - contine:
+		- vectorul de tip int* ce stocheaza etichetele replicilor in ordinea
+	data de valorile hash-urilor;
+		- o variabila ce contine numarul curent de replici;
+		- lista ce contine server-ele active.
+
+		Aceasta este cea mai importanta structura si reprezinta practic
+	load balancerul de care avem nevoie pentru a gestiona eficient stocarea
+	elementelor din servere.
+
+	2) server_memory - contine:
+		- id-ul server-ului;
+		- hashtable-ul unde sunt stocate perechile cheie - valoare.
+
+		Elementele de tip server_memory vor fi adaugate in lista din
+	structura load_balancer la fiecare adaugare a unui nou server. Trebuie
+	mentionat ca in timp ce serverele sunt unice si id-ul lor este unic,
+	hashring-ul structurii load_balancer contine si replicile serverelor,
+	stocand astfel de 3 ori mai multe 'id-uri', numite mai precis 'etichete'
+	si calculate dupa formula mentionata in enunt.
+
+
+
+-------------------------------------------------------------------------------
+
+FUNCTII:
+
+	Rolul fiecarei functii este precizat prin intermediul comentariilor din 
+fisierele .c . In final voi prezenta doar cateva detalii mai importante despre
+functiile implementate.
+	
+	1) In cadrul functiei loader_add_store() fiecare replica nou adaugata este
+comparata cu replicile deja existente. Am ales sa parcurg fiecare element al
+hash ring-ului si sa compar valoarea hash-ului curent cu valoarea hash-ului
+replicii de adaugat. Cazurile in care hash-ul replicii este mai mic decat
+hash-ul primei etichete din vector sau mai mare decat hash-ul ultimei etichete
+din vector sunt tratate separat. Un rationament asemanator are loc si in
+functiile loader_store() si loader_retrieve().
+
+	2) Functia transfer_values() are un rol foarte important, deoarece
+realizeaza "rebalansarea" elementelor atunci cand o replica noua este adaugata
+in hash ring. Valoarea hashurilor-ului cheilor de pe server-ul urmator in sens
+orar este comparata cu hash-ul etichetei replicii noi si, daca este cazul,
+perechile cheie - valoare sunt mutate. Apare ca un caz special situatia in care
+hash-ul cheii este mai mare decat toate elementele din hash ring.
+
+
+-------------------------------------------------------------------------------
